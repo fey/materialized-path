@@ -1,5 +1,5 @@
 {
-    "name": "langaner/materialized-path",
+    "name": "fey/materialized-path",
     "description": "Materialized path trait for Laravel 5",
     "keywords": ["laravel", "laravel-5", "path", "materialized", "tree", "eloquent", "database"],
     "license": "MIT",
@@ -7,11 +7,15 @@
         {
             "name": "Langaner",
             "email": "krashgt@gmail.com"
+        },
+        {
+            "name": "fey",
+            "email": "feycot@gmail.com"
         }
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/support": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*"
+        "illuminate/support": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*"
     },
     "autoload": {
         "psr-4": {
