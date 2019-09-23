@@ -4,6 +4,7 @@
 [![Total Downloads](https://poser.pugx.org/langaner/materialized-path/downloads)](https://packagist.org/packages/langaner/materialized-path) 
 [![Latest Unstable Version](https://poser.pugx.org/langaner/materialized-path/v/unstable)](https://packagist.org/packages/langaner/materialized-path) 
 [![License](https://poser.pugx.org/langaner/materialized-path/license)](https://packagist.org/packages/langaner/materialized-path)
+[![Maintainability](https://api.codeclimate.com/v1/badges/c974ea7cdbd489b8dba5/maintainability)](https://codeclimate.com/github/fey/materialized-path/maintainability)
 
 ### Installation
 
