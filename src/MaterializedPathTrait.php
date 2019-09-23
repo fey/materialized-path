@@ -72,9 +72,9 @@ trait MaterializedPathTrait
      */
     protected function createRootObject()
     {
-        $root = new $this;
+        $root = new $this();
         $root->fill([
-            $this->getColumnTreePath() => $this->separator.'0'.$this->separator,
+            $this->getColumnTreePath() => $this->separator . '0' . $this->separator,
             $this->getColumnTreePid() => null,
             $this->getColumnTreeDepth() => 0,
             $this->getColumnTreeOrder() => 0
@@ -97,7 +97,7 @@ trait MaterializedPathTrait
     public function makeRoot()
     {
         $this->fill([
-            $this->getColumnTreePath() => $this->separator.'0'.$this->separator,
+            $this->getColumnTreePath() => $this->separator . '0' . $this->separator,
             $this->getColumnTreePid() => null,
             $this->getColumnTreeDepth() => 0,
             $this->getColumnTreeOrder() => (static::allRoot()->max($this->getColumnTreeOrder()) + 1)
@@ -105,8 +105,10 @@ trait MaterializedPathTrait
 
         if ($this->useRealPath()) {
             $this->fill([
-                $this->getColumnTreeRealPath() => $this->{$this->columnAlias} == '' ? 'root' : $this->{$this->columnAlias},
-                $this->getColumnAlias() => $this->{$this->columnAlias} == '' ? 'root' : $this->{$this->columnAlias},
+                $this->getColumnTreeRealPath() => $this->{$this->columnAlias} == ''
+                ? 'root' : $this->{$this->columnAlias},
+                $this->getColumnAlias() => $this->{$this->columnAlias} == ''
+                ? 'root' : $this->{$this->columnAlias},
             ]);
         }
 
@@ -141,15 +143,24 @@ trait MaterializedPathTrait
         if ($this->exists) {
             $children = $this->childrenByDepth()->get();
 
-            foreach($children as $child) {
-                $path = str_replace($this->getTreePath(), $parent->getTreePath().$parent->getKey().$this->separator, $child->getTreePath());
+            foreach ($children as $child) {
+                $path = str_replace(
+                    $this->getTreePath(),
+                    $parent->getTreePath() . $parent->getKey() . $this->separator,
+                    $child->getTreePath()
+                );
+                $depth = ($parent->getTreeDepth() + 1 + ($child->getTreeDepth() - $this->getTreeDepth()));
                 $fields = [
                     $child->getColumnTreePath() => $path,
-                    $child->getColumnTreeDepth() => ($parent->getTreeDepth() + 1 + ($child->getTreeDepth() - $this->getTreeDepth())),
+                    $child->getColumnTreeDepth() => $depth,
                 ];
 
                 if ($this->useRealPath()) {
-                    $realPath = str_replace($this->getTreeRealPath(), $parent->getTreeRealPath().$this->separator.$parent->{$this->columnAlias}, $child->getTreeRealPath());
+                    $realPath = str_replace(
+                        $this->getTreeRealPath(),
+                        $parent->getTreeRealPath() . $this->separator . $parent->{$this->columnAlias},
+                        $child->getTreeRealPath()
+                    );
 
                     $fields[$child->getColumnTreeRealPath()] = $realPath;
                 }
@@ -158,7 +169,7 @@ trait MaterializedPathTrait
             }
         }
 
-        $path = $parent->getTreePath().$parent->getKey().$this->separator;
+        $path = $parent->getTreePath() . $parent->getKey() . $this->separator;
         
 
         $this->fill([
@@ -169,7 +180,7 @@ trait MaterializedPathTrait
         ]);
 
         if ($this->useRealPath()) {
-            $realPath = $parent->getTreeRealPath().$this->separator.$this->{$this->columnAlias};
+            $realPath = $parent->getTreeRealPath() . $this->separator . $this->{$this->columnAlias};
 
             $this->fill([
                 $this->getColumnTreeRealPath() => $realPath,
@@ -205,15 +216,24 @@ trait MaterializedPathTrait
         if ($this->exists) {
             $children = $this->childrenByDepth()->get();
 
-            foreach($children as $child) {
-                $path = str_replace($this->getTreePath(), $parent->getTreePath().$parent->getKey().$this->separator, $child->getTreePath());
+            foreach ($children as $child) {
+                $path = str_replace(
+                    $this->getTreePath(),
+                    $parent->getTreePath() . $parent->getKey() . $this->separator,
+                    $child->getTreePath()
+                );
+                $depth = ($parent->getTreeDepth() + 1 + ($child->getTreeDepth() - $this->getTreeDepth()));
                 $fields = [
                     $child->getColumnTreePath() => $path,
-                    $child->getColumnTreeDepth() => ($parent->getTreeDepth() + 1 + ($child->getTreeDepth() - $this->getTreeDepth())),
+                    $child->getColumnTreeDepth() => $depth,
                 ];
 
                 if ($this->useRealPath()) {
-                    $realPath = str_replace($this->getTreeRealPath(), $parent->getTreeRealPath().$this->separator.$parent->{$this->columnAlias}, $child->getTreeRealPath());
+                    $realPath = str_replace(
+                        $this->getTreeRealPath(),
+                        $parent->getTreeRealPath() . $this->separator . $parent->{$this->columnAlias},
+                        $child->getTreeRealPath()
+                    );
 
                     $fields[$child->getColumnTreeRealPath()] = $realPath;
                 }
@@ -222,7 +242,7 @@ trait MaterializedPathTrait
             }
         }
 
-        $path = $parent->getTreePath().$parent->getKey().$this->separator;
+        $path = $parent->getTreePath() . $parent->getKey() . $this->separator;
 
         $this->fill([
             $this->getColumnTreePath() => $path,
@@ -232,7 +252,7 @@ trait MaterializedPathTrait
         ]);
 
         if ($this->useRealPath()) {
-            $realPath = $parent->getTreeRealPath().$this->separator.$this->{$this->columnAlias};
+            $realPath = $parent->getTreeRealPath() . $this->separator . $this->{$this->columnAlias};
 
             $this->fill([
                 $this->getColumnTreeRealPath() => $realPath,
@@ -249,7 +269,7 @@ trait MaterializedPathTrait
      *
      * @param  int $node
      * @return \Illuminate\Database\Eloquent\Model
-     * 
+     *
      * @throws \Langaner\MaterializedPath\Exceptions\NodeNotFoundException
      */
     public function updateNode(Model $node)
@@ -264,21 +284,32 @@ trait MaterializedPathTrait
             $parent = $this->createRootObject();
         }
 
-        $node->sibling()->where($this->getColumnTreeOrder(), '>=', $node->getTreeOrder())->where('id', '!=', $node->id)->increment($this->getColumnTreeOrder());
+        $node->sibling()
+            ->where($this->getColumnTreeOrder(), '>=', $node->getTreeOrder())
+            ->where('id', '!=', $node->id)
+            ->increment($this->getColumnTreeOrder());
 
         $children = $node->childrenByDepth()->get();
 
         if ($parent->getTreeRealPath() === '') {
-            $path = $this->separator.'0'.$this->separator;
+            $path = $this->separator . '0' . $this->separator;
 
             if ($this->useRealPath()) {
                 $realPath = $node->{$this->columnAlias};
             }
         } else {
-            $path = str_replace($node->getTreePath(), $parent->getTreePath().$parent->id.$this->separator, $node->getTreePath());
+            $path = str_replace(
+                $node->getTreePath(),
+                $parent->getTreePath() . $parent->id . $this->separator,
+                $node->getTreePath()
+            );
 
             if ($this->useRealPath()) {
-                $realPath = str_replace($node->getTreeRealPath(), $parent->getTreeRealPath().$this->separator.$node->{$this->columnAlias}, $node->getTreeRealPath());
+                $realPath = str_replace(
+                    $node->getTreeRealPath(),
+                    $parent->getTreeRealPath() . $this->separator . $node->{$this->columnAlias},
+                    $node->getTreeRealPath()
+                );
             }
         }
 
@@ -295,14 +326,22 @@ trait MaterializedPathTrait
 
         $node->update($fields);
         
-        foreach($children as $child) {
-            $path = str_replace($child->getTreePath(), $node->getTreePath().$node->getKey().$this->separator, $child->getTreePath());
+        foreach ($children as $child) {
+            $path = str_replace(
+                $child->getTreePath(),
+                $node->getTreePath() . $node->getKey() . $this->separator,
+                $child->getTreePath()
+            );
             $fields = [
                 $child->getColumnTreePath() => $path
             ];
             
             if ($this->useRealPath()) {
-                $realPath = str_replace($child->getTreeRealPath(), $node->getTreeRealPath().$this->separator.$child->{$this->columnAlias}, $child->getTreeRealPath());
+                $realPath = str_replace(
+                    $child->getTreeRealPath(),
+                    $node->getTreeRealPath() . $this->separator . $child->{$this->columnAlias},
+                    $child->getTreeRealPath()
+                );
                 $fields[$node->getColumnTreeRealPath()] = $realPath;
             }
             
@@ -331,16 +370,19 @@ trait MaterializedPathTrait
             throw new SiblingNotFoundException('Sibling doesnt exist');
         }
 
-        $sibling->sibling()->where($this->getColumnTreeOrder(), $op, $sibling->getTreeOrder())->increment($this->getColumnTreeOrder());
+        $sibling->sibling()
+            ->where($this->getColumnTreeOrder(), $op, $sibling->getTreeOrder())
+            ->increment($this->getColumnTreeOrder());
 
         if ($this->exists) {
             $children = $this->childrenByDepth()->get();
 
-            foreach($children as $child) {
+            foreach ($children as $child) {
                 $path = str_replace($this->getTreePath(), $sibling->getTreePath(), $child->getTreePath());
+                $depth = ($sibling->getTreeDepth() + ($child->getTreeDepth() - $this->getTreeDepth()));
                 $fields = [
                     $child->getColumnTreePath() => $path,
-                    $child->getColumnTreeDepth() => ($sibling->getTreeDepth() + ($child->getTreeDepth() - $this->getTreeDepth())),
+                    $child->getColumnTreeDepth() => $depth,
                 ];
                 
                 if ($this->useRealPath()) {
@@ -353,7 +395,7 @@ trait MaterializedPathTrait
             }
         }
 
-        $path = $sibling->getTreePath().$sibling->getKey().$this->separator;
+        $path = $sibling->getTreePath() . $sibling->getKey() . $this->separator;
         
         $this->fill([
             $this->getColumnTreePath() => $path,
@@ -363,7 +405,7 @@ trait MaterializedPathTrait
         ]);
 
         if ($this->useRealPath()) {
-            $realPath = $sibling->getTreeRealPath().$this->separator.$this->{$this->columnAlias};
+            $realPath = $sibling->getTreeRealPath() . $this->separator . $this->{$this->columnAlias};
 
             $this->fill([
                 $this->getColumnTreeRealPath() => $realPath,
@@ -434,7 +476,11 @@ trait MaterializedPathTrait
                 $query->where($this->columnTreePid, '=', (int)$this->getKey());
             }
         } else {
-            $query->where($this->columnTreePath, 'like', $this->getTreePath().(int)$this->getKey().$this->separator.'%');
+            $query->where(
+                $this->columnTreePath,
+                'like',
+                $this->getTreePath() . (int)$this->getKey() . $this->separator . '%'
+            );
         }
 
         if ($depth) {
@@ -443,7 +489,8 @@ trait MaterializedPathTrait
 
         $config = $this->getConfig();
 
-        if ($config->get('materialized_path.with_translations') === true && method_exists($query->getModel(), 'translations')) {
+        if ($config->get('materialized_path.with_translations') === true
+        && method_exists($query->getModel(), 'translations')) {
             $query = $query->with('translations');
         }
 
@@ -472,7 +519,8 @@ trait MaterializedPathTrait
 
         $config = $this->getConfig();
         
-        if ($config->get('materialized_path.with_translations') === true && method_exists($query->getModel(), 'translations')) {
+        if ($config->get('materialized_path.with_translations') === true
+        && method_exists($query->getModel(), 'translations')) {
             $query = $query->with('translations');
         }
 
@@ -493,7 +541,7 @@ trait MaterializedPathTrait
             throw new ModelNotFoundException('Model doesnt exist');
         }
 
-        $path = $ancestor->getTreePath().$ancestor->getKey().$this->separator;
+        $path = $ancestor->getTreePath() . $ancestor->getKey() . $this->separator;
 
         return strpos($this->getTreePath(), $path) !== false && $ancestor->getTreePath() !== $this->getTreePath();
     }
@@ -503,7 +551,7 @@ trait MaterializedPathTrait
      *
      * @param  Model  $descendant
      * @return boolean
-     * 
+     *
      * @throws \Langaner\MaterializedPath\Exceptions\ModelNotFoundException
      */
     public function isAncestorOf(Model $descendant)
@@ -512,9 +560,10 @@ trait MaterializedPathTrait
             throw new ModelNotFoundException('Model doesnt exist');
         }
 
-        $path = $this->getTreePath().(int)$this->getKey().$this->separator;
+        $path = $this->getTreePath() . (int)$this->getKey() . $this->separator;
 
-        return strpos($descendant->getTreePath(), $path) !== false && $descendant->getTreePath() !== $this->getTreePath();
+        return strpos($descendant->getTreePath(), $path) !== false
+        && $descendant->getTreePath() !== $this->getTreePath();
     }
 
     /**
@@ -551,12 +600,13 @@ trait MaterializedPathTrait
      */
     public static function allRoot()
     {
-        $instance = with(new static);
+        $instance = with(new static());
         $query = $instance->newQuery()->whereNull($instance->getColumnTreePid());
 
         $config = $instance->getConfig();
 
-        if ($config->get('materialized_path.with_translations') === true && method_exists($query->getModel(), 'translations')) {
+        if ($config->get('materialized_path.with_translations') === true
+        && method_exists($query->getModel(), 'translations')) {
             $query = $query->with('translations');
         }
 
@@ -570,17 +620,22 @@ trait MaterializedPathTrait
      */
     public static function allLeaf()
     {
-        $instance = with(new static);
+        $instance = with(new static());
         $query = $instance->newQuery();
-        $query->select($instance->getTable().'.*');
-        $query->leftJoin($instance->getTable().' as t_2', function($join) use ($instance) {
-            $join->on($instance->getTable().'.'.$instance->getKeyName(), '=', 't_2.'.$instance->getColumnTreePid());
+        $query->select($instance->getTable() . '.*');
+        $query->leftJoin($instance->getTable() . ' as t_2', function ($join) use ($instance) {
+            $join->on(
+                $instance->getTable() . '.' . $instance->getKeyName(),
+                '=',
+                't_2.' . $instance->getColumnTreePid()
+            );
         })
         ->whereNull('t_2.id');
 
         $config = $instance->getConfig();
 
-        if ($config->get('materialized_path.with_translations') === true && method_exists($query->getModel(), 'translations')) {
+        if ($config->get('materialized_path.with_translations') === true
+        && method_exists($query->getModel(), 'translations')) {
             $query = $query->with('translations');
         }
 
@@ -598,7 +653,7 @@ trait MaterializedPathTrait
         $path = $path == null ? $this->getTreeRealPath() : $path;
         $path = explode($this->separator, $path);
 
-        return array_filter($path, function($item) {
+        return array_filter($path, function ($item) {
             return '' !== $item;
         });
     }
@@ -612,7 +667,7 @@ trait MaterializedPathTrait
     public function buildRealPath(array $entitys)
     {
         $realPath = [];
-        $instance = with(new static);
+        $instance = with(new static());
         $query = $instance->newQuery();
         $result = $query->whereIn('id', $entitys)->get();
 
@@ -625,7 +680,7 @@ trait MaterializedPathTrait
 
     /**
      * Get parent id attribute.
-     * 
+     *
      * @return int
      */
     public function getTreePid()
@@ -635,7 +690,7 @@ trait MaterializedPathTrait
 
     /**
      * Get order attribute.
-     * 
+     *
      * @return int
      */
     public function getTreeOrder()
@@ -645,7 +700,7 @@ trait MaterializedPathTrait
 
     /**
      * Get path attribute.
-     * 
+     *
      * @return string
      */
     public function getTreePath()
@@ -655,7 +710,7 @@ trait MaterializedPathTrait
 
     /**
      * Get real path attribute.
-     * 
+     *
      * @return string
      */
     public function getTreeRealPath()
@@ -665,7 +720,7 @@ trait MaterializedPathTrait
 
     /**
      * Get level attribute.
-     * 
+     *
      * @return int
      */
     public function getTreeDepth()
@@ -675,7 +730,7 @@ trait MaterializedPathTrait
 
     /**
      * Get parent id column.
-     * 
+     *
      * @return string
      */
     public function getColumnTreePid()
@@ -685,7 +740,7 @@ trait MaterializedPathTrait
 
     /**
      * Get order column.
-     * 
+     *
      * @return string
      */
     public function getColumnTreeOrder()
@@ -695,7 +750,7 @@ trait MaterializedPathTrait
 
     /**
      * Get path column.
-     * 
+     *
      * @return string
      */
     public function getColumnTreePath()
@@ -705,7 +760,7 @@ trait MaterializedPathTrait
 
     /**
      * Get real path column.
-     * 
+     *
      * @return string
      */
     public function getColumnTreeRealPath()
@@ -715,7 +770,7 @@ trait MaterializedPathTrait
 
     /**
      * Get alias column.
-     * 
+     *
      * @return string
      */
     public function getColumnAlias()
@@ -725,7 +780,7 @@ trait MaterializedPathTrait
 
     /**
      * Get level column.
-     * 
+     *
      * @return string
      */
     public function getColumnTreeDepth()
@@ -735,7 +790,7 @@ trait MaterializedPathTrait
 
     /**
      * Set parent id column.
-     * 
+     *
      * @return string
      */
     public function setColumnTreePid($name)
@@ -745,7 +800,7 @@ trait MaterializedPathTrait
 
     /**
      * Set order column.
-     * 
+     *
      * @return string
      */
     public function setColumnTreeOrder($name)
@@ -755,7 +810,7 @@ trait MaterializedPathTrait
 
     /**
      * Set path column.
-     * 
+     *
      * @return string
      */
     public function setColumnTreePath($name)
@@ -765,7 +820,7 @@ trait MaterializedPathTrait
 
     /**
      * Set real path column.
-     * 
+     *
      * @return string
      */
     public function setColumnTreeRealPath($name)
@@ -775,7 +830,7 @@ trait MaterializedPathTrait
 
     /**
      * Set level column.
-     * 
+     *
      * @return string
      */
     public function setColumnTreeDepth($name)
@@ -785,7 +840,7 @@ trait MaterializedPathTrait
 
     /**
      * Set alias column.
-     * 
+     *
      * @return string
      */
     public function setColumnAlias($name)
@@ -795,7 +850,7 @@ trait MaterializedPathTrait
 
     /**
      * User real path column(alias and real_path)
-     * 
+     *
      * @return boolean
      */
     public function useRealPath()
@@ -813,7 +868,7 @@ trait MaterializedPathTrait
      */
     public function scopeBuildChidrenTree($query, $parentId = null, $nodes = null, $level = null)
     {
-        $tree = new Collection;
+        $tree = new Collection();
         $parentId = $parentId === null ? $this->id : $parentId;
 
         if ($nodes === null) {
@@ -821,7 +876,7 @@ trait MaterializedPathTrait
         }
 
         foreach ($nodes as $node) {
-            if($node->parent_id == $parentId) {
+            if ($node->parent_id == $parentId) {
                 $children = $node->buildChidrenTree($node->id, $nodes, $level);
                 $node->children = $children;
                 $tree->add($node);
@@ -840,7 +895,7 @@ trait MaterializedPathTrait
      */
     public function scopeBuildTree($query, $parentId = null, $level = null)
     {
-        $tree = new Collection;
+        $tree = new Collection();
 
         if (is_null($parentId)) {
             $roots = static::allRoot();
@@ -849,7 +904,8 @@ trait MaterializedPathTrait
 
             $roots = $this->newQuery();
 
-            if ($config->get('materialized_path.with_translations') === true && method_exists($roots->getModel(), 'translations')) {
+            if ($config->get('materialized_path.with_translations') === true
+            && method_exists($roots->getModel(), 'translations')) {
                 $query = $roots->with('translations');
             }
 
