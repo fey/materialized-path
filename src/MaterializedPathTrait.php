@@ -388,7 +388,7 @@ trait MaterializedPathTrait
                 if ($this->useRealPath()) {
                     $realPath = $this->buildRealPath($this->getExplodedPath($path));
 
-                    $fields[$node->getColumnTreeRealPath()] = $realPath;
+                    $fields[$child->getColumnTreeRealPath()] = $realPath;
                 }
 
                 $child->update($fields);
